@@ -1,0 +1,16 @@
+.secondList:hover {
+    background-color: #ffffd3;
+}
+
+.secondList:hover .secondListSpan {
+    background-color: #ffffd3;
+}
+
+.secondLink:focus .secondList {
+    padding-left: 33px;
+}
+
+.secondLink:focus .secondListSpan {
+    width: 8px;
+    height: 28px;
+}

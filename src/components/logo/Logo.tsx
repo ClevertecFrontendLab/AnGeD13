@@ -6,8 +6,10 @@ import { BreadcrumbsContext } from '~/utils/breadCrumbsContext';
 
 export default function Logo() {
     const { setPath } = useContext(BreadcrumbsContext);
+    const { setActivePanel } = useContext(BreadcrumbsContext);
 
     const handleClick = () => {
+        setActivePanel(false);
         setPath([{ title: 'Главная', link: '/' }]);
     };
     return (

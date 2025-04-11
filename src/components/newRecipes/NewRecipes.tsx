@@ -16,7 +16,6 @@ export default function NewRecipes() {
                     lg: '402px',
                     xl: '414px',
                 }}
-                flexWrap='wrap'
                 overflow='hidden'
                 columnGap={{
                     base: '12px',

@@ -7,9 +7,11 @@ import { BreadcrumbsContext } from '~/utils/breadCrumbsContext';
 
 export default function Breadcrumbs() {
     const { path, setPath } = useContext(BreadcrumbsContext);
+    const { setActivePanel } = useContext(BreadcrumbsContext);
 
     const handleClick = (newTitle: string) => {
         if (newTitle === 'Главная') {
+            setActivePanel(false);
             setPath([{ title: 'Главная', link: '/' }]);
         }
     };

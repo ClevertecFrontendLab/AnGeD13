@@ -14,3 +14,9 @@
     width: 8px;
     height: 28px;
 }
+
+.defaultSpan {
+    padding-left: 8px;
+    margin-right: 11px;
+    transition: 'all 0.2s';
+}

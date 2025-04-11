@@ -10,17 +10,18 @@ import { BreadcrumbPath, BreadcrumbsContext } from '~/utils/breadCrumbsContext';
 
 function App() {
     const [path, setPath] = useState<BreadcrumbPath>([{ title: 'Главная', link: '/' }]);
+    const [activePanel, setActivePanel] = useState<boolean>(false);
 
     return (
-        <BrowserRouter>
-            <BreadcrumbsContext.Provider value={{ path, setPath }}>
+        <BreadcrumbsContext.Provider value={{ path, setPath, activePanel, setActivePanel }}>
+            <BrowserRouter>
                 <ChakraProvider theme={theme}>
                     <Header />
                     <Content />
                     <Footer />
                 </ChakraProvider>
-            </BreadcrumbsContext.Provider>
-        </BrowserRouter>
+            </BrowserRouter>
+        </BreadcrumbsContext.Provider>
     );
 }
 

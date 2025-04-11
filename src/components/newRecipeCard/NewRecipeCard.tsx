@@ -13,6 +13,11 @@ export default function NewRecipeCard({ ...item }: newRecipeCard) {
                 lg: '277px',
                 xl: '322px',
             }}
+            minW={{
+                base: '158px',
+                lg: '277px',
+                xl: '322px',
+            }}
             h={{
                 base: '220px',
                 lg: '402px',

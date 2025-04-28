@@ -5,19 +5,26 @@ import { RecipeCard } from '~/data/mainRecipesCard';
 import MainRecipeCard from '../mainRecipeCard/MainRecipeCard';
 import CustomTab from '../tab/CustomTab';
 
-interface AllRecipesProps {
-    recipes: RecipeCard[];
-    tabs?: string[];
+interface TabProps {
+    category: string;
+    items?: string[];
+    index: number;
 }
 
-export default function AllRecipes({ recipes, tabs }: AllRecipesProps) {
+interface AllRecipesProps {
+    recipes: RecipeCard[];
+    tabs?: TabProps;
+    filterText?: string;
+}
+
+export default function AllRecipes({ recipes, tabs, filterText }: AllRecipesProps) {
     return (
         <Box>
-            {tabs && <CustomTab tabs={tabs} />}
+            {tabs && <CustomTab tab={tabs} />}
             <Flex
                 as='section'
                 flexWrap='wrap'
-                justifyContent='center'
+                justifyContent='start'
                 rowGap='16px'
                 columnGap={{
                     base: '16px',
@@ -25,7 +32,7 @@ export default function AllRecipes({ recipes, tabs }: AllRecipesProps) {
                 }}
             >
                 {recipes.map((item, index) => (
-                    <MainRecipeCard key={index} {...item} />
+                    <MainRecipeCard key={index} {...item} filterText={filterText} index={index} />
                 ))}
             </Flex>
             <Flex justifyContent='center' paddingTop='16px'>

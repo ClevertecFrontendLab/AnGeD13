@@ -1,28 +1,13 @@
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { Button, Flex } from '@chakra-ui/react';
-import { useContext } from 'react';
 import { Link } from 'react-router';
 
 import { recipesHome } from '~/data/mainRecipesCard';
 import H2 from '~/ui/headings/H2';
-import { BreadcrumbsContext } from '~/utils/breadCrumbsContext';
 
 import MainRecipeCard from '../mainRecipeCard/MainRecipeCard';
 
 export default function BestSection() {
-    const { path, setPath } = useContext(BreadcrumbsContext);
-
-    const handleClick = (newTitle: string, newLink: string) => {
-        if (path.length > 1) {
-            setPath([
-                { title: 'Главная', link: '/' },
-                { title: newTitle, link: newLink },
-            ]);
-        } else {
-            setPath([...path, { title: newTitle, link: newLink }]);
-        }
-    };
-
     return (
         <Flex
             as='section'
@@ -41,9 +26,8 @@ export default function BestSection() {
                 }}
             >
                 <H2>Самое сочное</H2>
-                <Link to='/best'>
+                <Link to='/the-juiciest'>
                     <Button
-                        onClick={() => handleClick('Самое сочное', '/best')}
                         display={{
                             base: 'none',
                             lg: 'flex',
@@ -87,7 +71,7 @@ export default function BestSection() {
                 }}
             >
                 {recipesHome.map((item, index) => (
-                    <MainRecipeCard key={index} {...item} />
+                    <MainRecipeCard key={index} {...item} index={index} />
                 ))}
             </Flex>
             <Flex
@@ -97,7 +81,7 @@ export default function BestSection() {
                     lg: 'none',
                 }}
             >
-                <Link to='/best'>
+                <Link to='/the-juiciest'>
                     <Button
                         data-test-id='juiciest-link-mobile'
                         h='40px'

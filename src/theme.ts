@@ -1,4 +1,5 @@
-import { extendTheme } from '@chakra-ui/react';
+import { checkboxAnatomy } from '@chakra-ui/anatomy';
+import { createMultiStyleConfigHelpers, defineStyle, extendTheme } from '@chakra-ui/react';
 
 const customFonts = {
     font: `"Inter", sans-serif`,
@@ -19,14 +20,35 @@ const breakpoints = {
     sm: '360px',
     lit: '600',
     md: '768px',
-    mdfooter: '769',
+    mdfooter: '769px',
     big: '1024px',
     lg: '1440px',
     l: '1600px',
     xl: '1920px',
 };
 
+const customColors = {
+    lime: {
+        500: '#b1ff2e',
+    },
+};
+
+const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(
+    checkboxAnatomy.keys,
+);
+
+const baseStyle = definePartsStyle({
+    control: defineStyle({
+        border: '2px solid',
+        borderRadius: '2px',
+        borderColor: '#d7ff94',
+    }),
+});
+
+const checkboxTheme = defineMultiStyleConfig({ baseStyle });
+
 const theme = extendTheme({
+    components: { Checkbox: checkboxTheme },
     fonts: {
         font: `${customFonts.font}`,
         second: `${customFonts.second}`,
@@ -34,6 +56,7 @@ const theme = extendTheme({
     },
     fontWeights,
     breakpoints,
+    colors: customColors,
 });
 
 export default theme;

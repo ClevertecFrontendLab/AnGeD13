@@ -5,14 +5,13 @@ import CustomIcon from '~/components/icon/CustomIcon';
 import * as iconTypes from '../../components/icon/icons/Icons';
 
 interface Props {
-    svgId: string;
     category: string;
     badgeIcon: keyof typeof iconTypes;
     bg: string;
     styles?: React.CSSProperties;
 }
 
-export default function CategoryBadge({ svgId, category, badgeIcon, bg, styles }: Props) {
+export default function CategoryBadge({ category, badgeIcon, bg, styles }: Props) {
     return (
         <Badge
             h={6}
@@ -36,7 +35,7 @@ export default function CategoryBadge({ svgId, category, badgeIcon, bg, styles }
             color='#000'
             sx={styles}
         >
-            <CustomIcon name={badgeIcon} size={16} id={svgId} />
+            <CustomIcon name={badgeIcon} size={16} />
             {category}
         </Badge>
     );

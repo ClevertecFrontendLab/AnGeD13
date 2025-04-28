@@ -6,7 +6,6 @@ import * as iconTypes from '../icon/icons/Icons';
 interface Props {
     title: string;
     icon: keyof typeof iconTypes;
-    svgId: string;
 }
 
 export default function RelevantListItem({ ...item }: Props) {
@@ -39,7 +38,7 @@ export default function RelevantListItem({ ...item }: Props) {
                     '0 2px 4px -1px rgba(32, 126, 0, 0.06), 0 4px 6px -1px rgba(32, 126, 0, 0.1)',
             }}
         >
-            <CustomIcon name={item.icon} size={24} id={item.svgId} />
+            <CustomIcon name={item.icon} size={24} />
             <Heading
                 as='h3'
                 fontWeight={500}

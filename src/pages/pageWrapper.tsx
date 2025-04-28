@@ -2,8 +2,9 @@ import { Flex } from '@chakra-ui/react';
 import { Route, Routes } from 'react-router';
 
 import BestPage from './best/BestPage';
+import CategoryPage from './category/CategoryPage';
 import HomePage from './home/HomePage';
-import VeganPage from './vegan/VeganPage';
+import RecipePage from './recipe/RecipePage';
 
 export default function PageWrapper() {
     return (
@@ -33,9 +34,12 @@ export default function PageWrapper() {
             }}
         >
             <Routes>
-                <Route index element={<HomePage />} />
-                <Route path='/vegan' element={<VeganPage />} />
-                <Route path='/best' element={<BestPage />} />
+                <Route path='/' element={<HomePage />} />
+                <Route path='/the-juiciest' element={<BestPage />} />
+                <Route path='/:category' element={<CategoryPage />}>
+                    <Route path=':subcategory' element={<CategoryPage />} />
+                </Route>
+                <Route path='/:category/:subcategory/:id' element={<RecipePage />} />
             </Routes>
         </Flex>
     );

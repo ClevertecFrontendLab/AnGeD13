@@ -1,8 +1,13 @@
 import { Button } from '@chakra-ui/react';
 
-export default function CookButton() {
+interface TestProps {
+    index?: number;
+}
+
+export default function CookButton({ index }: TestProps) {
     return (
         <Button
+            data-test-id={`card-link-${index}`}
             h={{
                 base: '24px',
                 lg: '32px',

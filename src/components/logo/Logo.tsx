@@ -2,15 +2,13 @@ import { Box, Flex, Icon } from '@chakra-ui/react';
 import { useContext } from 'react';
 import { Link } from 'react-router';
 
-import { BreadcrumbsContext } from '~/utils/breadCrumbsContext';
+import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
 
 export default function Logo() {
-    const { setPath } = useContext(BreadcrumbsContext);
     const { setActivePanel } = useContext(BreadcrumbsContext);
 
     const handleClick = () => {
         setActivePanel(false);
-        setPath([{ title: 'Главная', link: '/' }]);
     };
     return (
         <Box

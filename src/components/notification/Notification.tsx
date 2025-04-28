@@ -1,15 +1,19 @@
 import { Flex, useBreakpointValue } from '@chakra-ui/react';
+import { useContext } from 'react';
 
+import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
 import NotificationItem from '~/ui/notificationItem/NotificationItem';
 
 import { BookmarkHeartIcon, CustomPeopleIcon, EmojiHeartEyesIcon } from '../icon/icons/Icons';
 
 export default function Notification() {
+    const { isBurgerOpen } = useContext(BreadcrumbsContext);
     const iconSize = useBreakpointValue({ base: 12, lg: 16 }, { ssr: false });
 
     return (
         <Flex
             as='ol'
+            display={`${isBurgerOpen ? 'none' : 'flex'}`}
             position={{ base: 'static', lg: 'absolute' }}
             top='85px'
             right='0px'

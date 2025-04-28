@@ -1,19 +1,22 @@
 import * as iconTypes from '../components/icon/icons/Icons';
 
-interface MenuItem {
+export interface MenuItem {
     title: string;
     icon: keyof typeof iconTypes;
     items: Array<string>;
+    path: string;
 }
 
 export const menuList: MenuItem[] = [
     {
         title: 'Салаты',
+        path: 'salads',
         icon: 'SaladsIcon',
         items: ['Мясные салаты', 'Рыбные салаты', 'Овощные салаты', 'Теплые салаты'],
     },
     {
         title: 'Закуски',
+        path: 'snacks',
         icon: 'SnacksIcon',
         items: [
             'Мясные закуски',
@@ -26,11 +29,13 @@ export const menuList: MenuItem[] = [
     },
     {
         title: 'Первые блюда',
+        path: 'first-dish',
         icon: 'FirstCourseIcon',
         items: ['Мясные супы', 'Овощные супы', 'Бульоны', 'Холодные супы', 'Диетические супы'],
     },
     {
         title: 'Вторые блюда',
+        path: 'second-dish',
         icon: 'SecondCourseIcon',
         items: [
             'Мясные',
@@ -49,6 +54,7 @@ export const menuList: MenuItem[] = [
     },
     {
         title: 'Десерты и выпечка',
+        path: 'desserts',
         icon: 'DessertIcon',
         items: [
             'Блины и оладьи',
@@ -68,11 +74,13 @@ export const menuList: MenuItem[] = [
     },
     {
         title: 'Блюда на гриле',
+        path: 'grills',
         icon: 'GrillIcon',
         items: ['Говядина', 'Свинина', 'Птица', 'Рыба', 'Грибы', 'Овощи'],
     },
     {
         title: 'Веганская кухня',
+        path: 'vegan-cuisine',
         icon: 'VeganIcon',
         items: [
             'Закуски',
@@ -87,6 +95,7 @@ export const menuList: MenuItem[] = [
     },
     {
         title: 'Детские блюда',
+        path: 'child',
         icon: 'ChildIcon',
         items: [
             'Первые блюда',
@@ -101,6 +110,7 @@ export const menuList: MenuItem[] = [
     },
     {
         title: 'Лечебное питание',
+        path: 'medical',
         icon: 'MedicalIcon',
         items: [
             'Детская диета',
@@ -124,6 +134,7 @@ export const menuList: MenuItem[] = [
     },
     {
         title: 'Национальные блюда',
+        path: 'national',
         icon: 'NationalIcon',
         items: [
             'Американская кухня',
@@ -145,11 +156,13 @@ export const menuList: MenuItem[] = [
     },
     {
         title: 'Соусы',
+        path: 'sauces',
         icon: 'SaucesIcon',
         items: ['Соусы мясные', 'Соусы сырные', 'Маринады'],
     },
     {
         title: 'Домашние заготовки',
+        path: 'homemade',
         icon: 'HomemadeIcon',
         items: [
             'Мясные заготовки',
@@ -164,6 +177,7 @@ export const menuList: MenuItem[] = [
     },
     {
         title: 'Напитки',
+        path: 'drinks',
         icon: 'DrinksIcon',
         items: [
             'Соки и фреши',

@@ -2,7 +2,12 @@ import { Flex, IconButton } from '@chakra-ui/react';
 
 import { CustomArrowBackIcon, CustomArrowForwardIcon } from '../icon/icons/Icons';
 
-export default function Slider() {
+interface Props {
+    nextSlide: () => void;
+    prevSlide: () => void;
+}
+
+export default function Slider({ nextSlide, prevSlide }: Props) {
     return (
         <Flex
             display={{
@@ -16,6 +21,9 @@ export default function Slider() {
             justifyContent='space-between'
         >
             <IconButton
+                data-test-id='carousel-back'
+                onClick={prevSlide}
+                zIndex={1}
                 h='48px'
                 w='48px'
                 bg='#000'
@@ -27,6 +35,9 @@ export default function Slider() {
                 }}
             />
             <IconButton
+                data-test-id='carousel-forward'
+                onClick={nextSlide}
+                zIndex={1}
                 h='48px'
                 w='48px'
                 bg='#000'

@@ -10,6 +10,7 @@ export default function Footer() {
             <Grid
                 as='nav'
                 position='fixed'
+                zIndex={3}
                 bottom='0px'
                 left='0px'
                 display={{ base: 'grid', mdfooter: 'none' }}

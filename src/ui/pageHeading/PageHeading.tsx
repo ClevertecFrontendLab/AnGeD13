@@ -21,7 +21,7 @@ export default function PageHeading({ children }: HeadingProps) {
             color='#000'
             paddingTop={{
                 base: '16px',
-                lg: '32px',
+                md: '32px',
             }}
         >
             {children}

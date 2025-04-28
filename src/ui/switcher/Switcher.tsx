@@ -1,8 +1,28 @@
 import { FormControl, FormLabel, Switch } from '@chakra-ui/react';
+import { Dispatch, SetStateAction } from 'react';
 
-export default function Switcher() {
+interface Props {
+    parent: string;
+    isAllergensSwitch: boolean;
+    setFilterIngredients: Dispatch<SetStateAction<string[]>>;
+    setIsAllergensSwitch: Dispatch<SetStateAction<boolean>>;
+}
+
+export default function Switcher({
+    parent,
+    isAllergensSwitch,
+    setFilterIngredients,
+    setIsAllergensSwitch,
+}: Props) {
+    const toggleSwitch = () => {
+        if (isAllergensSwitch) {
+            setFilterIngredients([]);
+        }
+        setIsAllergensSwitch((prev: boolean) => !prev);
+    };
+
     return (
-        <FormControl display='flex' alignItems='center' justifyContent='space-between'>
+        <FormControl display='flex' alignItems='center'>
             <FormLabel
                 htmlFor='allergy'
                 mb='0'
@@ -13,7 +33,12 @@ export default function Switcher() {
             >
                 Исключить мои аллергены
             </FormLabel>
-            <Switch id='allergy' colorScheme='green' />
+            <Switch
+                data-test-id={`allergens-switcher${parent === 'filter' ? '-filter' : ''}`}
+                colorScheme='lime'
+                isChecked={isAllergensSwitch}
+                onChange={toggleSwitch}
+            />
         </FormControl>
     );
 }

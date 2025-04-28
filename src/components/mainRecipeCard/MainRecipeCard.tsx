@@ -1,5 +1,7 @@
 import { Box, Card, CardBody, CardFooter, Flex, Heading, Image, Text } from '@chakra-ui/react';
+import { Link } from 'react-router';
 
+import { allRecipes } from '~/data/allRecipes';
 import { RecipeCard } from '~/data/mainRecipesCard';
 import CategoryBadge from '~/ui/badges/CategoryBadge';
 import RecommendationBadge from '~/ui/badges/RecommendationBadge';
@@ -8,9 +10,28 @@ import SaveButton from '~/ui/saveButton/SaveButton';
 
 import CardNotification from '../../ui/cardNotification/CardNotifiction';
 
-export default function MainRecipeCard({ ...item }: RecipeCard) {
+interface RecipeCardWithFilter extends RecipeCard {
+    filterText?: string;
+    index: number;
+}
+
+export default function MainRecipeCard({ ...item }: RecipeCardWithFilter) {
+    const highlightedTitle = item.title.replace(
+        new RegExp(`(${item.filterText})`, 'gi'),
+        `<span style="color: #2db100;">$1</span>`,
+    );
+
+    const getRecipeURL = () => {
+        const getRecipe = allRecipes.find((recipe) => recipe.title === item.title);
+        const category = getRecipe?.category[0];
+        const subcategory = getRecipe?.subcategory[0];
+        const id = getRecipe?.id;
+        return `/${category}/${subcategory}/${id}`;
+    };
+
     return (
         <Card
+            data-test-id={`food-card-${item.index}`}
             as='article'
             h={{
                 base: '128px',
@@ -33,6 +54,7 @@ export default function MainRecipeCard({ ...item }: RecipeCard) {
             borderRadius='8px'
             fontFamily='font'
             color='#000'
+            bg='transparent'
             transition='all 0.2s'
             _hover={{
                 boxShadow:
@@ -99,18 +121,23 @@ export default function MainRecipeCard({ ...item }: RecipeCard) {
                         w={{
                             big: '95%',
                         }}
+                        alignItems='start'
                         justifyContent='space-between'
                         columnGap={{
                             base: '30px',
                             lg: '0px',
                         }}
                     >
-                        <CategoryBadge
-                            svgId={item.svgId}
-                            category={item.badgeCategory}
-                            badgeIcon={item.badgeIcon}
-                            bg='#ffffd3'
-                        />
+                        <Flex columnGap='16px' rowGap='8px' flexWrap='wrap'>
+                            {item.badgeCategory.slice(0, 3).map((cat, index) => (
+                                <CategoryBadge
+                                    key={index}
+                                    category={cat}
+                                    badgeIcon={item.badgeIcon[index]}
+                                    bg='#ffffd3'
+                                />
+                            ))}
+                        </Flex>
                         <CardNotification bookmark={item.bookmark} emoji={item.emoji} />
                     </Flex>
                     <Box>
@@ -136,7 +163,10 @@ export default function MainRecipeCard({ ...item }: RecipeCard) {
                                 lg: '0px 8px',
                             }}
                         >
-                            {item.title}
+                            {item.filterText && (
+                                <span dangerouslySetInnerHTML={{ __html: highlightedTitle }} />
+                            )}
+                            {!item.filterText && item.title}
                         </Heading>
                         <Text
                             fontWeight={400}
@@ -167,7 +197,9 @@ export default function MainRecipeCard({ ...item }: RecipeCard) {
                     p={0}
                 >
                     <SaveButton />
-                    <CookButton />
+                    <Link to={getRecipeURL()}>
+                        <CookButton index={item.index} />
+                    </Link>
                 </CardFooter>
             </Flex>
         </Card>

@@ -8,36 +8,40 @@ import {
     List,
     ListItem,
 } from '@chakra-ui/react';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { Link } from 'react-router';
 
+import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
+import { breadcrumbsMapping, generateUrl } from '~/data/breadcrumbs';
 import { menuList } from '~/data/menu';
 import MenuIcon from '~/ui/menuIcon/Menuicon';
-import { BreadcrumbsContext } from '~/utils/breadCrumbsContext';
 
 import CustomIcon from '../icon/CustomIcon';
 import styles from './menu.module.css';
 
 export default function MenuComponent() {
-    const { setPath, activePanel, setActivePanel } = useContext(BreadcrumbsContext);
-    const [currentIndex, setCurrentIndex] = useState(-1);
+    const { activePanel, setActivePanel } = useContext(BreadcrumbsContext);
+    const { tabs, setTabs } = useContext(BreadcrumbsContext);
 
-    const handleClick = (mainTitle: string, subTitle: string, index: number) => {
-        setCurrentIndex(index);
+    const openAccordionIndex = breadcrumbsMapping.find((item) => item.name === tabs.title);
+
+    const handleClick = (mainTitle: string, index: number) => {
+        setTabs({ ...tabs, title: mainTitle, index: index });
         setActivePanel(true);
-        setPath([
-            { title: 'Главная', link: '/' },
-            { title: mainTitle, link: '/vegan' },
-            { title: subTitle, link: '/vegan' },
-        ]);
+    };
+
+    const getTestSubcategory = (category: string, index: number) => {
+        const cat = breadcrumbsMapping.find((item) => item.name === category);
+        return cat?.subcategories![index].path;
     };
 
     return (
         <Accordion
+            index={openAccordionIndex ? openAccordionIndex.id : 0}
             allowToggle
-            w='256px'
+            w='100%'
             overflowY='auto'
-            maxHeight='896px'
+            maxHeight='calc(100% - 144px)'
             fontSize={16}
             color='#000'
             p={2.5}
@@ -61,16 +65,12 @@ export default function MenuComponent() {
                 <AccordionItem key={index} borderTop='none' borderBottom='none'>
                     {({ isExpanded }) => (
                         <>
-                            <Link to='/vegan'>
+                            <Link to={`${generateUrl(item.title, 0)}`}>
                                 <AccordionButton
-                                    onClick={() => handleClick(item.title, item.items[0], -1)}
-                                    data-test-id={
-                                        item.title === 'Веганская кухня'
-                                            ? 'vegan-cuisine'
-                                            : undefined
-                                    }
-                                    w={230}
-                                    h={12}
+                                    onClick={() => handleClick(item.title, 0)}
+                                    data-test-id={`${item.path}`}
+                                    w='100%'
+                                    h='48px'
                                     paddingInline={2}
                                     transition='all 0.2s'
                                     _hover={{
@@ -105,18 +105,23 @@ export default function MenuComponent() {
                                     {item.items.map((listItem, index) => (
                                         <Link
                                             key={index}
-                                            to='/vegan'
+                                            to={`${generateUrl(item.title, index)}`}
                                             className={styles.secondLink}
-                                            onClick={() => handleClick(item.title, listItem, index)}
+                                            onClick={() => handleClick(item.title, index)}
                                         >
                                             <ListItem
+                                                data-test-id={
+                                                    activePanel && index === tabs.index
+                                                        ? `${getTestSubcategory(item.title, index)}-active`
+                                                        : null
+                                                }
                                                 className={styles.secondList}
                                                 h={9}
                                                 display='flex'
                                                 fontWeight={500}
                                                 lineHeight='150%'
                                                 paddingBlock={1.5}
-                                                paddingLeft={`${activePanel && index === 0 && currentIndex === -1 ? '33px' : '40px'}`}
+                                                paddingLeft={`${activePanel && index === tabs.index ? '33px' : '40px'}`}
                                                 paddingRight={2}
                                                 whiteSpace='nowrap'
                                                 overflow='hidden'
@@ -124,7 +129,7 @@ export default function MenuComponent() {
                                                 transition='all 0.2s'
                                             >
                                                 <Flex
-                                                    className={`${activePanel && index === 0 && currentIndex === -1 ? styles.defaultSpan : styles.secondListSpan}`}
+                                                    className={`${activePanel && index === tabs.index ? styles.defaultSpan : styles.secondListSpan}`}
                                                     w='1px'
                                                     h='24px'
                                                     bg='#c4ff61'

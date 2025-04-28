@@ -12,7 +12,6 @@ interface Props {
     badgeIcon: keyof typeof iconTypes;
     bookmark?: number;
     emoji?: number;
-    svgId: string;
 }
 
 export default function RelevantCard({ ...card }: Props) {
@@ -41,6 +40,7 @@ export default function RelevantCard({ ...card }: Props) {
                 xl: '20px',
             }}
             boxShadow='none'
+            bg='transparent'
             transition='all 0.2s'
             _hover={{
                 boxShadow:
@@ -88,7 +88,6 @@ export default function RelevantCard({ ...card }: Props) {
             </CardBody>
             <CardFooter p={0} display='flex' justifyContent='space-between'>
                 <CategoryBadge
-                    svgId={card.svgId}
                     category={card.badgeCategory}
                     badgeIcon={card.badgeIcon}
                     bg='#ffffd3'

@@ -7,13 +7,11 @@ interface Card {
     badgeIcon: keyof typeof iconTypes;
     bookmark?: number;
     emoji?: number;
-    svgId: string;
 }
 
 interface List {
     title: string;
     icon: keyof typeof iconTypes;
-    svgId: string;
 }
 
 interface ContentSection {
@@ -41,7 +39,6 @@ export const contentFooter: RelevantData = {
                 badgeIcon: 'SecondCourseIcon',
                 bookmark: 1,
                 emoji: 1,
-                svgId: 'rel_home_1',
             },
             {
                 title: 'Капустные котлеты',
@@ -51,24 +48,20 @@ export const contentFooter: RelevantData = {
                 badgeIcon: 'SecondCourseIcon',
                 bookmark: 2,
                 emoji: 1,
-                svgId: 'rel_home_2',
             },
         ],
         list: [
             {
                 title: 'Стейк для вегетарианцев',
                 icon: 'SecondCourseIcon',
-                svgId: 'rel_home_3',
             },
             {
                 title: 'Котлеты из гречки и фасоли',
                 icon: 'SecondCourseIcon',
-                svgId: 'rel_home_4',
             },
             {
                 title: 'Сырный суп с лапшой и брокколи',
                 icon: 'FirstCourseIcon',
-                svgId: 'rel_home_5',
             },
         ],
     },
@@ -85,7 +78,6 @@ export const contentFooter: RelevantData = {
                 badgeIcon: 'SecondCourseIcon',
                 bookmark: 1,
                 emoji: 1,
-                svgId: 'rel_best_1',
             },
             {
                 title: 'Капустные котлеты',
@@ -95,24 +87,20 @@ export const contentFooter: RelevantData = {
                 badgeIcon: 'SecondCourseIcon',
                 bookmark: 2,
                 emoji: 1,
-                svgId: 'rel_best_2',
             },
         ],
         list: [
             {
                 title: 'Стейк для вегетарианцев',
                 icon: 'SecondCourseIcon',
-                svgId: 'rel_best_3',
             },
             {
                 title: 'Котлеты из гречки и фасоли',
                 icon: 'SecondCourseIcon',
-                svgId: 'rel_best_4',
             },
             {
                 title: 'Сырный суп с лапшой и брокколи',
                 icon: 'FirstCourseIcon',
-                svgId: 'rel_best_5',
             },
         ],
     },
@@ -129,7 +117,6 @@ export const contentFooter: RelevantData = {
                 badgeIcon: 'ChildIcon',
                 bookmark: 1,
                 emoji: 1,
-                svgId: 'rel_vegan_1',
             },
             {
                 title: 'Нежный сливочно-сырный крем для кексов',
@@ -139,24 +126,20 @@ export const contentFooter: RelevantData = {
                 badgeIcon: 'ChildIcon',
                 bookmark: 2,
                 emoji: 1,
-                svgId: 'rel_vegan_2',
             },
         ],
         list: [
             {
                 title: 'Домашние сырные палочки',
                 icon: 'ChildIcon',
-                svgId: 'rel_vegan_3',
             },
             {
                 title: 'Панкейки',
                 icon: 'NationalIcon',
-                svgId: 'rel_vegan_4',
             },
             {
                 title: 'Воздушное банановое печенье на сковороде',
                 icon: 'VeganIcon',
-                svgId: 'rel_vegan_5',
             },
         ],
     },

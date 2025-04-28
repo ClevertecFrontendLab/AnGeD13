@@ -11,6 +11,7 @@ import { menuList } from '~/data/menu';
 export default function CategoryPage() {
     const { tabs } = useContext(BreadcrumbsContext);
     const categoryTabs = menuList.find((obj) => obj.title === tabs.title);
+    const [isTitleMatch, setIsTitleMatch] = useState<boolean | null>(null);
 
     const initRecipes = useMemo(() => {
         const categoryRecipes = recipesVegan.filter((item) => item.category.includes(tabs.title));
@@ -118,9 +119,28 @@ export default function CategoryPage() {
         filterGlobalCategories,
     ]);
 
+    useEffect(() => {
+        if (filterRecipeTitle.length > 0) {
+            const getMatch = filteredRecipes.filter((item) =>
+                item.title.toLowerCase().includes(filterRecipeTitle),
+            );
+            if (getMatch.length > 0) {
+                setIsTitleMatch(true);
+            } else {
+                setIsTitleMatch(false);
+            }
+        } else {
+            setIsTitleMatch(null);
+        }
+    }, [filterRecipeTitle, filteredRecipes]);
+
     return (
         <>
-            <PageHeader title='Веганская кухня' veganDescription={true} />
+            <PageHeader
+                title='Веганская кухня'
+                veganDescription={true}
+                isTitleMatch={isTitleMatch}
+            />
             <Flex flexDirection='column' rowGap='40px'>
                 {filteredRecipes.length > 0 && (
                     <AllRecipes

@@ -31,7 +31,7 @@ export default function NewRecipes() {
                 ref={swiperRef}
                 loop={true}
                 navigation={{ enabled: false }}
-                speed={1}
+                speed={0}
                 spaceBetween='12px'
                 slidesPerView={4}
                 watchOverflow={true}

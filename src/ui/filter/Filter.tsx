@@ -147,6 +147,19 @@ export default function Filter() {
                     boxShadow='0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 20px 25px -5px rgba(0, 0, 0, 0.1)'
                     overflowY='scroll'
                     h='calc(100vh)'
+                    sx={{
+                        '&::-webkit-scrollbar': {
+                            width: '8px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: 'rgba(0, 0, 0, 0.16)',
+                            borderRadius: '8px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                            borderRadius: '4px',
+                        },
+                    }}
                 >
                     <Flex alignItems='center' justifyContent='space-between' paddingBottom='16px'>
                         <Heading

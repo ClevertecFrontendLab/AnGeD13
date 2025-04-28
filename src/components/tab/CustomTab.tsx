@@ -34,9 +34,9 @@ export default function CustomTab({ tab }: Prop) {
             }}
             fontFamily='font'
             marginBottom='24px'
-            minH='43px'
         >
             <TabList
+                w='100%'
                 flexWrap={{
                     base: 'nowrap',
                     lg: 'wrap',
@@ -45,9 +45,9 @@ export default function CustomTab({ tab }: Prop) {
                     base: 'start',
                     lg: 'center',
                 }}
-                overflowX={{
-                    base: 'scroll',
-                    lg: 'auto',
+                overflow={{
+                    base: 'hidden',
+                    lg: 'visible',
                 }}
             >
                 {tab.items &&

@@ -18,6 +18,7 @@ export default function BestPage() {
     } = useContext(BreadcrumbsContext);
     const [filteredRecipes, setFilteredRecipes] = useState<RecipeCard[]>([]);
     const { filterIngredients } = useContext(BreadcrumbsContext);
+    const [isTitleMatch, setIsTitleMatch] = useState<boolean | null>(null);
 
     useEffect(() => {
         const areFilters =
@@ -100,9 +101,24 @@ export default function BestPage() {
         filterGlobalCategories,
     ]);
 
+    useEffect(() => {
+        if (filterRecipeTitle.length > 0) {
+            const getMatch = filteredRecipes.filter((item) =>
+                item.title.toLowerCase().includes(filterRecipeTitle),
+            );
+            if (getMatch.length > 0) {
+                setIsTitleMatch(true);
+            } else {
+                setIsTitleMatch(false);
+            }
+        } else {
+            setIsTitleMatch(null);
+        }
+    }, [filterRecipeTitle, filteredRecipes]);
+
     return (
         <>
-            <PageHeader title='Самое сочное' />
+            <PageHeader title='Самое сочное' isTitleMatch={isTitleMatch} />
             <Flex flexDirection='column' rowGap='40px'>
                 {filteredRecipes.length > 0 && (
                     <AllRecipes recipes={filteredRecipes} filterText={filterRecipeTitle} />

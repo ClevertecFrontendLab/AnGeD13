@@ -21,6 +21,7 @@ export default function HomePage() {
     } = useContext(BreadcrumbsContext);
     const [filteredRecipes, setFilteredRecipes] = useState<RecipeCard[]>([]);
     const { filterIngredients } = useContext(BreadcrumbsContext);
+    const [isTitleMatch, setIsTitleMatch] = useState<boolean | null>(null);
 
     useEffect(() => {
         const areFilters =
@@ -103,9 +104,24 @@ export default function HomePage() {
         filterGlobalCategories,
     ]);
 
+    useEffect(() => {
+        if (filterRecipeTitle.length > 0) {
+            const getMatch = filteredRecipes.filter((item) =>
+                item.title.toLowerCase().includes(filterRecipeTitle),
+            );
+            if (getMatch.length > 0) {
+                setIsTitleMatch(true);
+            } else {
+                setIsTitleMatch(false);
+            }
+        } else {
+            setIsTitleMatch(null);
+        }
+    }, [filterRecipeTitle, filteredRecipes]);
+
     return (
         <>
-            <PageHeader title='Приятного аппетита!' />
+            <PageHeader title='Приятного аппетита!' isTitleMatch={isTitleMatch} />
             <Flex
                 flexDirection='column'
                 rowGap={{

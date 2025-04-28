@@ -12,9 +12,10 @@ import Switcher from '~/ui/switcher/Switcher';
 interface HeaderData {
     title: string;
     veganDescription?: boolean;
+    isTitleMatch: boolean | null;
 }
 
-export default function PageHeader({ title, veganDescription }: HeaderData) {
+export default function PageHeader({ title, veganDescription, isTitleMatch }: HeaderData) {
     const { screenWidth } = useScreenWidth();
 
     const { setFilterIngredients, isFilterOpen } = useContext(BreadcrumbsContext);
@@ -94,7 +95,7 @@ export default function PageHeader({ title, veganDescription }: HeaderData) {
             <Flex as='form' flexDirection='column' rowGap={4}>
                 <Flex columnGap={3}>
                     <Filter />
-                    <Searcher />
+                    <Searcher isTitleMatch={isTitleMatch} />
                 </Flex>
 
                 {screenWidth >= 1440 && (

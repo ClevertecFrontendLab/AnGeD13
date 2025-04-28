@@ -105,14 +105,13 @@ export default function DetailRecipeCard({ ...item }: Recipe) {
                                 lg: '100%',
                             }}
                             overflow='hidden'
-                            noOfLines={{
-                                base: 2,
-                                md: 1,
-                                lg: 2,
-                            }}
                             marginBottom={{
                                 base: '16px',
                                 lg: '24px',
+                            }}
+                            w={{
+                                base: '100%',
+                                xl: '55%',
                             }}
                         >
                             {item.title}

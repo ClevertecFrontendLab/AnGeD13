@@ -4,12 +4,17 @@ import { useContext, useState } from 'react';
 
 import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
 
-export default function Searcher() {
-    const { setFilterRecipeTitle } = useContext(BreadcrumbsContext);
-    const [title, setTitle] = useState<string>('');
+interface Props {
+    isTitleMatch: boolean | null;
+}
+
+export default function Searcher({ isTitleMatch }: Props) {
+    const { filterRecipeTitle, setFilterRecipeTitle } = useContext(BreadcrumbsContext);
+    const [title, setTitle] = useState<string>(filterRecipeTitle);
 
     const getTitle = () => {
         setFilterRecipeTitle(title.toLowerCase());
+        getBorder();
     };
 
     const handleKeyPress = (key: string) => {
@@ -21,6 +26,18 @@ export default function Searcher() {
     const cleanInput = () => {
         setTitle('');
         setFilterRecipeTitle('');
+    };
+
+    const getBorder = () => {
+        if (isTitleMatch === null) {
+            return '1px solid rgba(0, 0, 0, 0.48)';
+        } else {
+            if (isTitleMatch === true) {
+                return '1px solid #2db100';
+            } else {
+                return '2px solid #e53e3e';
+            }
+        }
     };
 
     return (
@@ -53,16 +70,17 @@ export default function Searcher() {
                     base: 14,
                     lg: 18,
                 }}
-                border='1px solid rgba(0, 0, 0, 0.48)'
+                border={`${getBorder()}`}
                 borderRadius='6px'
                 color='#134b00'
-                outline='none'
                 sx={{
                     '::placeholder': {
                         color: '#134b00',
                     },
                 }}
-                focusBorderColor='#134b00'
+                _focusVisible={{
+                    border: `${getBorder()}`,
+                }}
             />
             <InputRightElement
                 h={{
@@ -77,6 +95,7 @@ export default function Searcher() {
                 <Flex h='100%' w='100%' minWidth='32px' alignItems='center'>
                     {title && (
                         <IconButton
+                            type='button'
                             bg='transparent'
                             onClick={cleanInput}
                             aria-label='Clean input'
@@ -96,6 +115,7 @@ export default function Searcher() {
                     )}
                 </Flex>
                 <IconButton
+                    type='button'
                     data-test-id='search-button'
                     isDisabled={!(title.length >= 3)}
                     onClick={getTitle}

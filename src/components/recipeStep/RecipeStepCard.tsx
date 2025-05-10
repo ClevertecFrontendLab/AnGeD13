@@ -1,4 +1,6 @@
-import { Box, Card, CardBody, Image, Text } from '@chakra-ui/react';
+import { Box, Card, CardBody, Flex, Image, Text } from '@chakra-ui/react';
+
+import { SRC_BASE_URL } from '~/constants/paths';
 
 interface StepProps {
     step: {
@@ -29,8 +31,8 @@ export default function RecipeStepCard({ step, index, len }: StepProps) {
                         lg: '244px',
                     }}
                     borderRadius='8px'
-                    src={step.image}
-                    alt='Картинка отображающая суть шага'
+                    src={`${SRC_BASE_URL}/${step.image}`}
+                    alt='Картинка, отображающая суть шага'
                 />
             )}
             <CardBody
@@ -46,19 +48,20 @@ export default function RecipeStepCard({ step, index, len }: StepProps) {
                     lg: '20px 24px',
                 }}
             >
-                <Box
-                    h='24px'
-                    w='57px'
-                    borderRadius='4px'
-                    padding='2px 8px'
-                    bg={`${index === len ? '#ffffd3' : 'rgba(0, 0, 0, 0.06)'}`}
-                    fontWeight={400}
-                    fontSize={14}
-                    lineHeight='143%'
-                    color='#000'
-                >
-                    Шаг {step.stepNumber}
-                </Box>
+                <Flex>
+                    <Box
+                        h='24px'
+                        borderRadius='4px'
+                        padding='2px 8px'
+                        bg={`${index === len ? '#ffffd3' : 'rgba(0, 0, 0, 0.06)'}`}
+                        fontWeight={400}
+                        fontSize={14}
+                        lineHeight='143%'
+                        color='#000'
+                    >
+                        Шаг {step.stepNumber}
+                    </Box>
+                </Flex>
                 <Text fontWeight={400} fontSize={14} lineHeight='143%' color='#000'>
                     {step.description}
                 </Text>

@@ -1,5 +1,7 @@
 import { Flex } from '@chakra-ui/react';
+import { useContext } from 'react';
 
+import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
 import { useScreenWidth } from '~/hooks/useScreenWidth';
 import PageWrapper from '~/pages/pageWrapper';
 
@@ -8,6 +10,8 @@ import Sidebar from '../sidebar/Sidebar';
 
 export default function Content() {
     const { screenWidth } = useScreenWidth();
+    const { isAuthorized } = useContext(BreadcrumbsContext);
+
     return (
         <Flex
             columnGap={6}
@@ -20,7 +24,7 @@ export default function Content() {
                 lg: 'normal',
             }}
         >
-            {screenWidth >= 1440 && (
+            {screenWidth >= 1440 && isAuthorized && (
                 <Flex
                     position='fixed'
                     data-test-id='nav'

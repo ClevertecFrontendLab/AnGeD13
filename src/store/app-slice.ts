@@ -16,6 +16,7 @@ export const appSlice = createSlice({
         },
         setAppLoader(state, { payload: isLoading }: PayloadAction<boolean>) {
             state.isLoading = isLoading;
+            console.log('main loading', state.isLoading);
         },
     },
 });

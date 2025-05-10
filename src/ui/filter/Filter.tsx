@@ -21,24 +21,39 @@ import { FilterIcon } from '~/components/icon/icons/Icons';
 import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
 import { authors } from '~/data/authors';
 import { meatTypes } from '~/data/meatTypes';
-import { menuList } from '~/data/menu';
 import { sidedishTypes } from '~/data/sidedishTypes';
+import { useGetCategoriesQuery } from '~/query/category-api';
+import { useAppDispatch } from '~/store/hooks';
+import {
+    setAllergensFilter,
+    setAuthorsFilter,
+    setCategoryFilter,
+    setGarnishFilter,
+    setMeatFilter,
+    setSubCategoryFilter,
+} from '~/store/recipe-slice';
 
 import AllergicMenu from '../allergicMenu/AllergicMenu';
 import Switcher from '../switcher/Switcher';
 import Tag from '../tag/Tag';
 
 export default function Filter() {
+    const dispatch = useAppDispatch();
+    const { data } = useGetCategoriesQuery();
+    const categories = data?.filter((category) => category.subCategories) || [];
     const iconSize = useBreakpointValue({ base: 14, lg: 24 }, { ssr: false });
     const filterRef = useRef<HTMLDivElement>(null);
     const {
         isFilterOpen,
+        setIsSearching,
+        filterIngredients,
         setIsFilterOpen,
         setFilterIngredients,
         setFilterGlobalMeatType,
         setFilterGlobalSideType,
         setFilterGlobalAuthor,
         setFilterGlobalCategories,
+        setIsActiveSwitcher,
     } = useContext(BreadcrumbsContext);
     const [isMeatTypes, setIsMeatTypes] = useState<string[]>([]);
     const [isSideTypes, setIsSideTypes] = useState<string[]>([]);
@@ -46,23 +61,20 @@ export default function Filter() {
     const [filterAuthors, setFilterAuthors] = useState<string[]>([]);
     const [allSelectedValues, setAllSelectedValues] = useState<string[]>([]);
 
-    const [localSwitch, setLocalSwitch] = useState<boolean>(false);
-    const [localAllergens, setLocalAllergens] = useState<string[]>([]);
-
     useEffect(() => {
         setAllSelectedValues([
             ...isMeatTypes,
             ...isSideTypes,
             ...filterCategories,
             ...filterAuthors,
-            ...localAllergens,
+            ...filterIngredients,
         ]);
-    }, [isMeatTypes, isSideTypes, filterCategories, filterAuthors, localAllergens]);
+    }, [isMeatTypes, isSideTypes, filterCategories, filterAuthors, filterIngredients]);
 
     const isReadyToFilter = () => {
         const typeMeatSide = isMeatTypes.length > 0 || isSideTypes.length > 0;
         const filters = filterCategories.length > 0 || filterAuthors.length > 0;
-        return typeMeatSide || filters || localAllergens.length > 0;
+        return typeMeatSide || filters || filterIngredients.length > 0;
     };
 
     const openFilterMenu = () => {
@@ -71,6 +83,7 @@ export default function Filter() {
 
     const findRecipes = () => {
         saveParams();
+        setIsSearching(true);
         closeFilterMenu();
     };
 
@@ -79,7 +92,22 @@ export default function Filter() {
         setFilterGlobalSideType(isSideTypes);
         setFilterGlobalAuthor(filterAuthors);
         setFilterGlobalCategories(filterCategories);
-        setFilterIngredients(localAllergens);
+        setFilterIngredients(filterIngredients);
+
+        const categoriesIdsArray = categories.filter((category) =>
+            filterCategories.includes(category.title),
+        );
+
+        const AllcategoriesIds = categoriesIdsArray
+            .map((category) => category.subCategories.map((subCategory) => subCategory._id))
+            .flatMap((ids) => ids);
+
+        dispatch(setMeatFilter(isMeatTypes));
+        dispatch(setGarnishFilter(isSideTypes));
+        dispatch(setAuthorsFilter(filterAuthors));
+        dispatch(setCategoryFilter(filterCategories));
+        dispatch(setSubCategoryFilter(AllcategoriesIds));
+        dispatch(setAllergensFilter(filterIngredients));
     };
 
     const closeFilterMenu = () => {
@@ -88,12 +116,12 @@ export default function Filter() {
     };
 
     const cleanFilters = () => {
-        setLocalSwitch(false);
+        setIsActiveSwitcher(false);
         setIsMeatTypes([]);
         setIsSideTypes([]);
         setFilterCategories([]);
         setFilterAuthors([]);
-        setLocalAllergens([]);
+        setFilterIngredients([]);
     };
 
     useOutsideClick({
@@ -285,7 +313,7 @@ export default function Filter() {
                                                 }
                                             >
                                                 <Stack direction='column' spacing='0px'>
-                                                    {menuList.map((item, index) => (
+                                                    {categories.map((item, index) => (
                                                         <Checkbox
                                                             data-test-id={
                                                                 item.title === 'Веганская кухня'
@@ -504,18 +532,8 @@ export default function Filter() {
                             </Box>
 
                             <Flex flexDirection='column' alignItems='' rowGap='14px'>
-                                <Switcher
-                                    parent='filter'
-                                    isAllergensSwitch={localSwitch}
-                                    setIsAllergensSwitch={setLocalSwitch}
-                                    setFilterIngredients={setLocalAllergens}
-                                />
-                                <AllergicMenu
-                                    parent='filter'
-                                    setFilterIngredients={setLocalAllergens}
-                                    filterIngredients={localAllergens}
-                                    isAllergensSwitch={localSwitch}
-                                />
+                                <Switcher parent='filter' />
+                                <AllergicMenu parent='filter' />
                             </Flex>
                         </Flex>
 

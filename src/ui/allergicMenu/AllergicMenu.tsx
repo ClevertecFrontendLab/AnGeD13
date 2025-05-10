@@ -11,25 +11,19 @@ import {
     Stack,
     Text,
 } from '@chakra-ui/react';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useContext, useState } from 'react';
 
+import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
 import { allergens as defaultAllergens } from '~/data/allergens';
 
 interface Props {
     parent: string;
-    isAllergensSwitch: boolean;
-    filterIngredients: string[];
-    setFilterIngredients: Dispatch<SetStateAction<string[]>>;
     isFilterOpen?: boolean;
 }
 
-export default function AllergicMenu({
-    parent,
-    filterIngredients,
-    setFilterIngredients,
-    isAllergensSwitch,
-    isFilterOpen,
-}: Props) {
+export default function AllergicMenu({ parent, isFilterOpen }: Props) {
+    const { isActiveSwitcher, filterIngredients, setFilterIngredients } =
+        useContext(BreadcrumbsContext);
     const [customAllergen, setCustomAllergen] = useState<string>('');
 
     const handleAddCustomAllergen = () => {
@@ -49,7 +43,7 @@ export default function AllergicMenu({
                 <>
                     <MenuButton
                         data-test-id={`allergens-menu-button${parent === 'filter' ? '-filter' : ''}`}
-                        disabled={!isAllergensSwitch}
+                        disabled={!isActiveSwitcher}
                         type='button'
                         display='flex'
                         justifyContent='space-between'

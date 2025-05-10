@@ -1,14 +1,20 @@
 import { Button, Grid, Heading } from '@chakra-ui/react';
 
-import CustomIcon from '../icon/CustomIcon';
-import * as iconTypes from '../icon/icons/Icons';
+import { SRC_BASE_URL } from '~/constants/paths';
+import { useGetCategoriesQuery } from '~/query/category-api';
+import { TRecipe } from '~/store/types';
 
-interface Props {
-    title: string;
-    icon: keyof typeof iconTypes;
-}
+export default function RelevantListItem({ ...item }: TRecipe) {
+    const { data } = useGetCategoriesQuery();
+    const categories = data?.filter((category) => category.subCategories) || [];
+    const getCategory = (id: string) =>
+        categories.find(
+            (catItem) => catItem.subCategories.some((sub) => sub._id === id) || catItem._id === id,
+        );
 
-export default function RelevantListItem({ ...item }: Props) {
+    const badgesInfo = item.categoriesIds.map((item) => getCategory(item));
+    const uniqueBadges = [...new Set(badgesInfo)];
+
     return (
         <Grid
             as='article'
@@ -38,7 +44,7 @@ export default function RelevantListItem({ ...item }: Props) {
                     '0 2px 4px -1px rgba(32, 126, 0, 0.06), 0 4px 6px -1px rgba(32, 126, 0, 0.1)',
             }}
         >
-            <CustomIcon name={item.icon} size={24} />
+            <img src={`${SRC_BASE_URL}/${uniqueBadges[0]?.icon}`} width='24px' height='24px' />
             <Heading
                 as='h3'
                 fontWeight={500}

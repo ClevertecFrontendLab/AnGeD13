@@ -1,17 +1,45 @@
 import { Card, CardBody, CardFooter, Flex, Heading, Image, Text } from '@chakra-ui/react';
 import { Link } from 'react-router';
 
-import { Recipe } from '~/data/allRecipes';
+import { SRC_BASE_URL } from '~/constants/paths';
+import { useGetCategoriesQuery } from '~/query/category-api';
+import { TRecipe } from '~/store/types';
 import CategoryBadge from '~/ui/badges/CategoryBadge';
 import CardNotification from '~/ui/cardNotification/CardNotifiction';
 
-interface RecipeWithTest extends Recipe {
+interface RecipeWithTest extends TRecipe {
     index: number;
 }
 
 export default function NewRecipeCard({ ...item }: RecipeWithTest) {
+    const { data } = useGetCategoriesQuery();
+    const categories = data?.filter((category) => category.subCategories) || [];
+    const getCategory = (id: string) =>
+        categories.find(
+            (catItem) => catItem.subCategories.some((sub) => sub._id === id) || catItem._id === id,
+        );
+
+    const badgesInfo = item.categoriesIds.map((item) => getCategory(item));
+    const uniqueBadges = [...new Set(badgesInfo)];
+
+    const formRecipeUrl = (categoryId: string) => {
+        const cat = categories.find((catItem) =>
+            catItem.subCategories.some((sub) => sub._id === categoryId),
+        );
+        let categoryUrl;
+        let subCategoryUrl;
+        let subIndex;
+        if (cat) {
+            categoryUrl = cat?.category;
+            subIndex = cat?.subCategories.findIndex((item) => item._id === categoryId);
+            subCategoryUrl = cat?.subCategories[subIndex].category;
+        }
+
+        return `${categoryUrl}/${subCategoryUrl}`;
+    };
+
     return (
-        <Link to={`/${item.category[0]}/${item.subcategory[0]}/${item.id}`}>
+        <Link to={`/${formRecipeUrl(item.categoriesIds[0])}/${item._id}`}>
             <Card
                 data-test-id={`carousel-card-${item.index}`}
                 as='article'
@@ -46,8 +74,9 @@ export default function NewRecipeCard({ ...item }: RecipeWithTest) {
             >
                 <CardBody p={0}>
                     <Image
-                        src={item.imageUrl}
+                        src={`${SRC_BASE_URL}/${item.image}`}
                         alt={item.title}
+                        objectFit='cover'
                         borderTopRadius='8px'
                         h={{
                             base: '128px',
@@ -131,18 +160,18 @@ export default function NewRecipeCard({ ...item }: RecipeWithTest) {
                         top='8px'
                         left='8px'
                     >
-                        <Flex w='80%' flexWrap='wrap' gap='8px' overflow='hidden'>
-                            {item.badgeCategory.slice(0, 3).map((cat, index) => (
+                        <Flex flexWrap='wrap' gap='8px' overflow='hidden'>
+                            {uniqueBadges.slice(0, 3).map((cat, index) => (
                                 <CategoryBadge
                                     key={index}
-                                    category={cat}
-                                    badgeIcon={item.badgeIcon[index]}
+                                    category={cat?.title}
+                                    badgeIcon={cat?.icon}
                                     bg='#ffffd3'
                                 />
                             ))}
                         </Flex>
                     </Flex>
-                    <CardNotification bookmark={item.bookmark} emoji={item.emoji} />
+                    <CardNotification bookmark={item.bookmarks} likes={item.likes} />
                 </CardFooter>
             </Card>
         </Link>

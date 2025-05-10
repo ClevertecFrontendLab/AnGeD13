@@ -3,21 +3,21 @@ import { useContext } from 'react';
 import { Link } from 'react-router';
 
 import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
-import { breadcrumbsMapping, generateUrl } from '~/data/breadcrumbs';
-
-interface TabProps {
-    category: string;
-    items?: string[];
-    index: number;
-}
+import { useGetCategoriesQuery } from '~/query/category-api';
+import { TSubCategory } from '~/store/types';
+import { generateUrl } from '~/utils/generateUrl';
 
 interface Prop {
-    tab: TabProps;
+    tab: TSubCategory[];
+    category: string;
+    subIndex: number;
 }
 
-export default function CustomTab({ tab }: Prop) {
+export default function CustomTab({ tab, category, subIndex }: Prop) {
+    const { data } = useGetCategoriesQuery();
+    const categories = data?.filter((category) => category.subCategories) || [];
     const { tabs, setTabs } = useContext(BreadcrumbsContext);
-    const testTabs = breadcrumbsMapping.find((item) => item.name === tab.category);
+    const testTabs = categories.find((item) => item.title === category);
     const handleClick = (index: number) => {
         setTabs({ ...tabs, index: index });
     };
@@ -26,7 +26,7 @@ export default function CustomTab({ tab }: Prop) {
         <Tabs
             as='section'
             defaultIndex={0}
-            index={tab.index}
+            index={subIndex}
             display='flex'
             justifyContent={{
                 base: 'start',
@@ -50,11 +50,11 @@ export default function CustomTab({ tab }: Prop) {
                     lg: 'visible',
                 }}
             >
-                {tab.items &&
-                    tab.items.map((item, index) => (
-                        <Link to={`${generateUrl(tab.category, index)}`} key={index}>
+                {tab &&
+                    tab.map((item, index) => (
+                        <Link to={`${generateUrl(categories, category, index)}`} key={index}>
                             <Tab
-                                data-test-id={`tab-${testTabs?.subcategories![index].path}-${index}`}
+                                data-test-id={`tab-${testTabs?.subCategories![index].category}-${index}`}
                                 onClick={() => handleClick(index)}
                                 fontWeight={500}
                                 fontSize={16}
@@ -63,7 +63,7 @@ export default function CustomTab({ tab }: Prop) {
                                 whiteSpace='nowrap'
                                 _selected={{ color: '#2db100' }}
                             >
-                                {item}
+                                {item.title}
                             </Tab>
                         </Link>
                     ))}

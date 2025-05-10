@@ -1,20 +1,22 @@
-import { Card, CardBody, CardFooter, CardHeader, Heading, Text } from '@chakra-ui/react';
+import { Card, CardBody, CardFooter, CardHeader, Flex, Heading, Text } from '@chakra-ui/react';
 
+import { useGetCategoriesQuery } from '~/query/category-api';
+import { TRecipe } from '~/store/types';
 import CategoryBadge from '~/ui/badges/CategoryBadge';
 import CardNotification from '~/ui/cardNotification/CardNotifiction';
 
-import * as iconTypes from '../icon/icons/Icons';
+export default function RelevantCard({ ...card }: TRecipe) {
+    const { data } = useGetCategoriesQuery();
+    const categories = data?.filter((category) => category.subCategories) || [];
+    const getCategory = (id: string) =>
+        categories.find(
+            (catItem) => catItem.subCategories.some((sub) => sub._id === id) || catItem._id === id,
+        );
 
-interface Props {
-    title: string;
-    description: string;
-    badgeCategory: string;
-    badgeIcon: keyof typeof iconTypes;
-    bookmark?: number;
-    emoji?: number;
-}
+    const badgesInfo = card.categoriesIds.map((item) => getCategory(item));
 
-export default function RelevantCard({ ...card }: Props) {
+    console.log('relevant cats', badgesInfo);
+    const uniqueBadges = [...new Set(badgesInfo)];
     return (
         <Card
             as='article'
@@ -87,16 +89,17 @@ export default function RelevantCard({ ...card }: Props) {
                 </Text>
             </CardBody>
             <CardFooter p={0} display='flex' justifyContent='space-between'>
-                <CategoryBadge
-                    category={card.badgeCategory}
-                    badgeIcon={card.badgeIcon}
-                    bg='#ffffd3'
-                    styles={{
-                        padding: '8px',
-                        columnGap: '8px',
-                    }}
-                />
-                <CardNotification bookmark={card.bookmark} emoji={card.emoji} />
+                <Flex flexWrap='wrap' gap='8px' overflow='hidden'>
+                    {uniqueBadges.slice(0, 3).map((cat, index) => (
+                        <CategoryBadge
+                            key={index}
+                            category={cat?.title}
+                            badgeIcon={cat?.icon}
+                            bg='#ffffd3'
+                        />
+                    ))}
+                </Flex>
+                <CardNotification bookmark={card.bookmarks} likes={card.likes} />
             </CardFooter>
         </Card>
     );

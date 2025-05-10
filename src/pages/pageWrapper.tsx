@@ -1,8 +1,11 @@
 import { Flex } from '@chakra-ui/react';
 import { Route, Routes } from 'react-router';
 
+import { NOT_FOUND, THE_JUICIEST } from '~/constants/paths';
+
 import BestPage from './best/BestPage';
 import CategoryPage from './category/CategoryPage';
+import ErrorPage from './error/ErrorPage';
 import HomePage from './home/HomePage';
 import RecipePage from './recipe/RecipePage';
 
@@ -35,7 +38,8 @@ export default function PageWrapper() {
         >
             <Routes>
                 <Route path='/' element={<HomePage />} />
-                <Route path='/the-juiciest' element={<BestPage />} />
+                <Route path={`${NOT_FOUND}`} element={<ErrorPage />} />
+                <Route path={`${THE_JUICIEST}`} element={<BestPage />} />
                 <Route path='/:category' element={<CategoryPage />}>
                     <Route path=':subcategory' element={<CategoryPage />} />
                 </Route>

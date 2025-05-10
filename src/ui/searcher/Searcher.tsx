@@ -1,20 +1,33 @@
 import { CloseIcon, SearchIcon } from '@chakra-ui/icons';
 import { Flex, IconButton, Input, InputGroup, InputRightElement } from '@chakra-ui/react';
-import { useContext, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useState } from 'react';
 
 import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
+import { useAppDispatch } from '~/store/hooks';
+import { setAllergensFilter, setSearchString } from '~/store/recipe-slice';
 
 interface Props {
     isTitleMatch: boolean | null;
+    setIsStartSearching?: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function Searcher({ isTitleMatch }: Props) {
-    const { filterRecipeTitle, setFilterRecipeTitle } = useContext(BreadcrumbsContext);
+export default function Searcher({ isTitleMatch, setIsStartSearching }: Props) {
+    const dispatch = useAppDispatch();
+
+    const { filterRecipeTitle, setFilterRecipeTitle, filterIngredients, setIsSearching } =
+        useContext(BreadcrumbsContext);
     const [title, setTitle] = useState<string>(filterRecipeTitle);
 
     const getTitle = () => {
+        console.log('click');
+        dispatch(setSearchString(title.trim()));
+        dispatch(setAllergensFilter(filterIngredients));
+        setIsSearching(true);
         setFilterRecipeTitle(title.toLowerCase());
         getBorder();
+        if (setIsStartSearching) {
+            setIsStartSearching(true);
+        }
     };
 
     const handleKeyPress = (key: string) => {
@@ -26,6 +39,9 @@ export default function Searcher({ isTitleMatch }: Props) {
     const cleanInput = () => {
         setTitle('');
         setFilterRecipeTitle('');
+        dispatch(setSearchString(''));
+        dispatch(setAllergensFilter([]));
+        setIsSearching(false);
     };
 
     const getBorder = () => {
@@ -117,7 +133,7 @@ export default function Searcher({ isTitleMatch }: Props) {
                 <IconButton
                     type='button'
                     data-test-id='search-button'
-                    isDisabled={!(title.length >= 3)}
+                    isDisabled={!(title.length >= 3 || filterIngredients.length > 0)}
                     onClick={getTitle}
                     h='100%'
                     w='100%'

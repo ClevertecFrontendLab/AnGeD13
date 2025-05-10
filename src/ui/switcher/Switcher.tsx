@@ -1,24 +1,20 @@
 import { FormControl, FormLabel, Switch } from '@chakra-ui/react';
-import { Dispatch, SetStateAction } from 'react';
+import { useContext } from 'react';
+
+import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
 
 interface Props {
     parent: string;
-    isAllergensSwitch: boolean;
-    setFilterIngredients: Dispatch<SetStateAction<string[]>>;
-    setIsAllergensSwitch: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function Switcher({
-    parent,
-    isAllergensSwitch,
-    setFilterIngredients,
-    setIsAllergensSwitch,
-}: Props) {
+export default function Switcher({ parent }: Props) {
+    const { isActiveSwitcher, setIsActiveSwitcher, setFilterIngredients } =
+        useContext(BreadcrumbsContext);
     const toggleSwitch = () => {
-        if (isAllergensSwitch) {
+        if (isActiveSwitcher) {
             setFilterIngredients([]);
         }
-        setIsAllergensSwitch((prev: boolean) => !prev);
+        setIsActiveSwitcher((prev: boolean) => !prev);
     };
 
     return (
@@ -36,7 +32,7 @@ export default function Switcher({
             <Switch
                 data-test-id={`allergens-switcher${parent === 'filter' ? '-filter' : ''}`}
                 colorScheme='lime'
-                isChecked={isAllergensSwitch}
+                isChecked={isActiveSwitcher}
                 onChange={toggleSwitch}
             />
         </FormControl>

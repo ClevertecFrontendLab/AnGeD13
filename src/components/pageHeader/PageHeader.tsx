@@ -1,8 +1,10 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, CircularProgress, Flex } from '@chakra-ui/react';
 import { useContext, useEffect, useState } from 'react';
 
 import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
+import { useLazyRecipesSearch } from '~/hooks/useRecipesSearch';
 import { useScreenWidth } from '~/hooks/useScreenWidth';
+import { useToast } from '~/hooks/useToast';
 import AllergicMenu from '~/ui/allergicMenu/AllergicMenu';
 import Filter from '~/ui/filter/Filter';
 import PageHeading from '~/ui/pageHeading/PageHeading';
@@ -11,16 +13,35 @@ import Switcher from '~/ui/switcher/Switcher';
 
 interface HeaderData {
     title: string;
-    veganDescription?: boolean;
+    categoryDescription?: string;
     isTitleMatch: boolean | null;
 }
 
-export default function PageHeader({ title, veganDescription, isTitleMatch }: HeaderData) {
+export default function PageHeader({ title, categoryDescription, isTitleMatch }: HeaderData) {
     const { screenWidth } = useScreenWidth();
-
+    const { data, isFetching, runSearch, isError } = useLazyRecipesSearch();
     const { setFilterIngredients, isFilterOpen } = useContext(BreadcrumbsContext);
-    const [localSwitch, setLocalSwitch] = useState<boolean>(false);
-    const [localAllergens, setLocalAllergens] = useState<string[]>([]);
+    const [localSwitch] = useState<boolean>(false);
+    const [localAllergens] = useState<string[]>([]);
+    const [isStartSearching, setIsStartSearching] = useState<boolean>(false);
+    const { showError } = useToast();
+
+    console.log('data', data);
+
+    useEffect(() => {
+        if (isError) {
+            showError('Ошибка сервера', 'Попробуйте поискать снова попозже');
+        }
+    }, [isError, showError]);
+
+    useEffect(() => {
+        if (isStartSearching) {
+            runSearch();
+            if (data) {
+                setIsStartSearching(false);
+            }
+        }
+    }, [runSearch, data, isStartSearching, setIsStartSearching]);
 
     useEffect(() => {
         if (localSwitch) {
@@ -47,6 +68,7 @@ export default function PageHeader({ title, veganDescription, isTitleMatch }: He
                 md: '20px',
             }}
             paddingBottom='16px'
+            paddingTop='32px'
             borderRadius={{
                 base: '0 0 8px 8px',
                 xl: '24px',
@@ -67,8 +89,24 @@ export default function PageHeader({ title, veganDescription, isTitleMatch }: He
             }}
         >
             <Flex flexDirection='column' rowGap={3} alignItems='center'>
-                <PageHeading>{title}</PageHeading>
-                {veganDescription && (
+                {(isTitleMatch || data === undefined) && <PageHeading>{title}</PageHeading>}
+                {data && data.length === 0 && (
+                    <Box
+                        w={{
+                            base: '100%',
+                            lg: '410px',
+                        }}
+                        fontFamily='font'
+                        fontWeight={600}
+                        fontSize={16}
+                        lineHeight='150%'
+                        textAlign='center'
+                        color='#000'
+                    >
+                        По вашему запросу ничего не найдено. Попробуйте другой запрос
+                    </Box>
+                )}
+                {categoryDescription && (
                     <Box
                         w={{
                             base: '100%',
@@ -87,35 +125,51 @@ export default function PageHeader({ title, veganDescription, isTitleMatch }: He
                         textAlign='center'
                         color='rgba(0, 0, 0, 0.48)'
                     >
-                        Интересны не только убеждённым вегетарианцам, но и тем, кто хочет
-                        попробовать вегетарианскую диету и готовить вкусные вегетарианские блюда.
+                        {categoryDescription}
                     </Box>
                 )}
             </Flex>
-            <Flex as='form' flexDirection='column' rowGap={4}>
-                <Flex columnGap={3}>
-                    <Filter />
-                    <Searcher isTitleMatch={isTitleMatch} />
-                </Flex>
-
-                {screenWidth >= 1440 && (
-                    <Flex columnGap={4} zIndex={2}>
-                        <Switcher
-                            parent='page'
-                            isAllergensSwitch={localSwitch}
-                            setIsAllergensSwitch={setLocalSwitch}
-                            setFilterIngredients={setLocalAllergens}
+            {isFetching ? (
+                <Flex
+                    w='80px'
+                    h='80px'
+                    justifyContent='center'
+                    alignItems='center'
+                    opacity={0.7}
+                    borderRadius='50%'
+                    bg='radial-gradient( #C4FF61 0%, transparent 100%)'
+                >
+                    <Box w='24px' h='24px'>
+                        <CircularProgress
+                            data-test-id='loader-search-block'
+                            isIndeterminate
+                            capIsRound={true}
+                            value={70}
+                            size='100%'
+                            color='black'
+                            trackColor='transparent'
+                            thickness='6px'
                         />
-                        <AllergicMenu
-                            parent='page'
-                            setFilterIngredients={setLocalAllergens}
-                            filterIngredients={localAllergens}
-                            isAllergensSwitch={localSwitch}
-                            isFilterOpen={isFilterOpen}
+                    </Box>
+                </Flex>
+            ) : (
+                <Flex as='form' flexDirection='column' rowGap={4}>
+                    <Flex columnGap={3}>
+                        <Filter />
+                        <Searcher
+                            isTitleMatch={isTitleMatch}
+                            setIsStartSearching={setIsStartSearching}
                         />
                     </Flex>
-                )}
-            </Flex>
+
+                    {screenWidth >= 1440 && (
+                        <Flex columnGap={4} zIndex={2}>
+                            <Switcher parent='page' />
+                            <AllergicMenu parent='page' isFilterOpen={isFilterOpen} />
+                        </Flex>
+                    )}
+                </Flex>
+            )}
         </Flex>
     );
 }

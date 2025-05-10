@@ -1,132 +1,123 @@
-import { Flex } from '@chakra-ui/react';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { Button, Flex } from '@chakra-ui/react';
+import { useContext, useEffect, useState } from 'react';
 
 import AllRecipes from '~/components/allRecipes/AllRecipes';
 import PageHeader from '~/components/pageHeader/PageHeader';
 import RelevantSection from '~/components/relevantSection/RelevantSection';
 import { BreadcrumbsContext } from '~/contexts/breadCrumbsContext';
-import { RecipeCard, recipesBest, recipesHome, recipesVegan } from '~/data/mainRecipesCard';
+import { useRecipesSearch } from '~/hooks/useRecipesSearch';
+import { useScreenWidth } from '~/hooks/useScreenWidth';
+import { useGetBestRecipesQuery } from '~/query/recipe-api';
+import { useAppDispatch, useAppSelector } from '~/store/hooks';
+import { setCurrentPage } from '~/store/recipe-slice';
+import { TRecipe } from '~/store/types';
 
 export default function BestPage() {
-    const initRecipes = useMemo(() => [...recipesHome, ...recipesBest, ...recipesVegan], []);
-    const {
-        filterRecipeTitle,
-        filterGlobalMeatType,
-        filterGlobalSideType,
-        filterGlobalAuthor,
-        filterGlobalCategories,
-    } = useContext(BreadcrumbsContext);
-    const [filteredRecipes, setFilteredRecipes] = useState<RecipeCard[]>([]);
-    const { filterIngredients } = useContext(BreadcrumbsContext);
-    const [isTitleMatch, setIsTitleMatch] = useState<boolean | null>(null);
+    const { screenWidth } = useScreenWidth();
+    const { isSearching } = useContext(BreadcrumbsContext);
+    const filters = useAppSelector((state) => state.recipe.filters);
+    const dispatch = useAppDispatch();
+    const [recipes, setRecipes] = useState<TRecipe[]>([]);
+    const pagination = useAppSelector((state) => state.recipe.pagination);
 
-    useEffect(() => {
-        const areFilters =
-            filterRecipeTitle ||
-            filterIngredients.length > 0 ||
-            filterGlobalMeatType.length > 0 ||
-            filterGlobalSideType.length > 0 ||
-            filterGlobalAuthor.length > 0 ||
-            filterGlobalCategories.length > 0;
-        if (areFilters) {
-            const filtered = initRecipes.filter((item) => {
-                const matchTitle = item.title.toLowerCase().includes(filterRecipeTitle);
+    const { data: filteredRecipes } = useRecipesSearch();
 
-                let containsAllIngredients = false;
-                if (filterIngredients.length > 0) {
-                    containsAllIngredients = filterIngredients.some((ingredient) =>
-                        item.ingredients?.some((i) =>
-                            i.title.toLowerCase().includes(ingredient.toLowerCase()),
-                        ),
-                    );
-                }
-
-                let containsMeatTypes = true;
-                if (filterGlobalMeatType.length > 0) {
-                    if (item.meat) {
-                        containsMeatTypes = filterGlobalMeatType.includes(item.meat);
-                    } else {
-                        containsMeatTypes = false;
-                    }
-                }
-
-                let containsSideTypes = true;
-                if (filterGlobalSideType.length > 0) {
-                    if (item.side) {
-                        containsSideTypes = filterGlobalSideType.includes(item.side);
-                    } else {
-                        containsSideTypes = false;
-                    }
-                }
-
-                let containsAuthors = true;
-                if (filterGlobalAuthor.length > 0) {
-                    if (item.author) {
-                        containsAuthors = filterGlobalAuthor.includes(item.author);
-                    } else {
-                        containsAuthors = false;
-                    }
-                }
-
-                let containsCategories = true;
-                if (filterGlobalCategories.length > 0) {
-                    containsCategories = item.category.some((category) =>
-                        filterGlobalCategories.includes(category),
-                    );
-                } else {
-                    containsCategories = true;
-                }
-
-                return (
-                    matchTitle &&
-                    !containsAllIngredients &&
-                    containsMeatTypes &&
-                    containsSideTypes &&
-                    containsAuthors &&
-                    containsCategories
-                );
-            });
-
-            setFilteredRecipes(filtered);
-        } else {
-            setFilteredRecipes([]);
-        }
-    }, [
-        filterRecipeTitle,
-        initRecipes,
-        filterIngredients,
-        filterGlobalSideType,
-        filterGlobalMeatType,
-        filterGlobalAuthor,
-        filterGlobalCategories,
-    ]);
-
-    useEffect(() => {
-        if (filterRecipeTitle.length > 0) {
-            const getMatch = filteredRecipes.filter((item) =>
-                item.title.toLowerCase().includes(filterRecipeTitle),
-            );
-            if (getMatch.length > 0) {
-                setIsTitleMatch(true);
-            } else {
-                setIsTitleMatch(false);
+    const isMatching = () => {
+        if (filters.searchString) {
+            if (filteredRecipes && filteredRecipes.length > 0) {
+                return true;
             }
-        } else {
-            setIsTitleMatch(null);
+            return false;
         }
-    }, [filterRecipeTitle, filteredRecipes]);
+        return null;
+    };
+
+    const { data, currentData } = useGetBestRecipesQuery(
+        {
+            limit: 8,
+            page: pagination.currentPage,
+        },
+        {
+            refetchOnMountOrArgChange: true,
+        },
+    );
+
+    const hasMore = data?.meta ? pagination.currentPage < data.meta.totalPages : false;
+
+    useEffect(() => {
+        if (currentData?.data) {
+            if (pagination.currentPage === 1) {
+                setRecipes(currentData.data);
+            } else {
+                setRecipes((prev) => [...prev, ...currentData.data]);
+            }
+        }
+    }, [currentData?.data, pagination.currentPage]);
+
+    console.log('pagination in best', pagination.currentPage, recipes, data?.data);
+
+    useEffect(() => {
+        console.log('cur 1');
+        dispatch(setCurrentPage(1));
+    }, [dispatch]);
+
+    const loadMore = () => {
+        if (hasMore) {
+            console.log('load more');
+            dispatch(setCurrentPage(pagination.currentPage + 1));
+        }
+    };
 
     return (
         <>
-            <PageHeader title='Самое сочное' isTitleMatch={isTitleMatch} />
+            <PageHeader title='Самое сочное' isTitleMatch={isMatching()} />
             <Flex flexDirection='column' rowGap='40px'>
-                {filteredRecipes.length > 0 && (
-                    <AllRecipes recipes={filteredRecipes} filterText={filterRecipeTitle} />
+                {isSearching && (
+                    <AllRecipes recipes={recipes} filterText={filters.searchString} page='best' />
                 )}
-                {filteredRecipes.length === 0 && (
+                {!isSearching && (
                     <>
-                        <AllRecipes recipes={recipesBest} />
-                        <RelevantSection pageTitle='best' />
+                        <AllRecipes recipes={recipes} page='best' />
+                        {hasMore && (
+                            <Flex justifyContent='center' paddingTop='16px'>
+                                {screenWidth >= 1440 ? (
+                                    <Button
+                                        onClick={loadMore}
+                                        data-test-id='load-more-button'
+                                        w='152px'
+                                        h='40px'
+                                        bg='#b1ff2e'
+                                        borderRadius='6px'
+                                        paddingInline='16px'
+                                        fontFamily='font'
+                                        fontWeight={600}
+                                        fontSize={16}
+                                        lineHeight='150%'
+                                        color='#000'
+                                    >
+                                        Загрузить еще
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={loadMore}
+                                        data-test-id='load-more-button'
+                                        w='152px'
+                                        h='40px'
+                                        bg='#b1ff2e'
+                                        borderRadius='6px'
+                                        paddingInline='16px'
+                                        fontFamily='font'
+                                        fontWeight={600}
+                                        fontSize={16}
+                                        lineHeight='150%'
+                                        color='#000'
+                                    >
+                                        Загрузка
+                                    </Button>
+                                )}
+                            </Flex>
+                        )}
+                        <RelevantSection />
                     </>
                 )}
             </Flex>

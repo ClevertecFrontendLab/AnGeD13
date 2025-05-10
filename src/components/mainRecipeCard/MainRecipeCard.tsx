@@ -1,8 +1,9 @@
 import { Box, Card, CardBody, CardFooter, Flex, Heading, Image, Text } from '@chakra-ui/react';
 import { Link } from 'react-router';
 
-import { allRecipes } from '~/data/allRecipes';
-import { RecipeCard } from '~/data/mainRecipesCard';
+import { SRC_BASE_URL } from '~/constants/paths';
+import { useGetCategoriesQuery } from '~/query/category-api';
+import { TRecipe } from '~/store/types';
 import CategoryBadge from '~/ui/badges/CategoryBadge';
 import RecommendationBadge from '~/ui/badges/RecommendationBadge';
 import CookButton from '~/ui/cookButton/CookButton';
@@ -10,30 +11,49 @@ import SaveButton from '~/ui/saveButton/SaveButton';
 
 import CardNotification from '../../ui/cardNotification/CardNotifiction';
 
-interface RecipeCardWithFilter extends RecipeCard {
+interface RecipeCardWithFilter extends TRecipe {
     filterText?: string;
     index: number;
 }
 
 export default function MainRecipeCard({ ...item }: RecipeCardWithFilter) {
+    const { data } = useGetCategoriesQuery();
+    const categories = data?.filter((category) => category.subCategories) || [];
+
+    const getCategory = (id: string) =>
+        categories.find(
+            (catItem) => catItem.subCategories.some((sub) => sub._id === id) || catItem._id === id,
+        );
+
+    const badgesInfo = item.categoriesIds.map((item) => getCategory(item));
+    const uniqueBadges = [...new Set(badgesInfo)];
+
     const highlightedTitle = item.title.replace(
         new RegExp(`(${item.filterText})`, 'gi'),
         `<span style="color: #2db100;">$1</span>`,
     );
 
-    const getRecipeURL = () => {
-        const getRecipe = allRecipes.find((recipe) => recipe.title === item.title);
-        const category = getRecipe?.category[0];
-        const subcategory = getRecipe?.subcategory[0];
-        const id = getRecipe?.id;
-        return `/${category}/${subcategory}/${id}`;
+    const formRecipeUrl = (categoryId: string) => {
+        const cat = categories.find((catItem) =>
+            catItem.subCategories.some((sub) => sub._id === categoryId),
+        );
+        let categoryUrl;
+        let subCategoryUrl;
+        let subIndex;
+        if (cat) {
+            categoryUrl = cat?.category;
+            subIndex = cat?.subCategories.findIndex((item) => item._id === categoryId);
+            subCategoryUrl = cat?.subCategories[subIndex].category;
+        }
+
+        return `/${categoryUrl}/${subCategoryUrl}`;
     };
 
     return (
         <Card
             data-test-id={`food-card-${item.index}`}
             as='article'
-            h={{
+            minH={{
                 base: '128px',
                 big: '15vw',
                 lg: '244px',
@@ -61,10 +81,10 @@ export default function MainRecipeCard({ ...item }: RecipeCardWithFilter) {
                     '0 2px 4px -1px rgba(32, 126, 0, 0.06), 0 4px 6px -1px rgba(32, 126, 0, 0.1)',
             }}
         >
-            {item.personNameRecommendation && item.personAvatarRecommendation && (
+            {(item.authorData?.firstName || item.authorData?.lastName) && (
                 <RecommendationBadge
-                    name={item.personNameRecommendation}
-                    svgSrc={item.personAvatarRecommendation}
+                    name={item.authorData?.firstName}
+                    surname={item.authorData?.lastName}
                 />
             )}
             <Image
@@ -75,7 +95,7 @@ export default function MainRecipeCard({ ...item }: RecipeCardWithFilter) {
                     lg: '346px',
                 }}
                 objectFit='cover'
-                src={item.imageUrl}
+                src={`${SRC_BASE_URL}/${item.image}`}
                 alt={item.title}
             />
             <Flex
@@ -129,16 +149,16 @@ export default function MainRecipeCard({ ...item }: RecipeCardWithFilter) {
                         }}
                     >
                         <Flex columnGap='16px' rowGap='8px' flexWrap='wrap'>
-                            {item.badgeCategory.slice(0, 3).map((cat, index) => (
+                            {uniqueBadges.slice(0, 3).map((cat, index) => (
                                 <CategoryBadge
                                     key={index}
-                                    category={cat}
-                                    badgeIcon={item.badgeIcon[index]}
+                                    category={cat?.title}
+                                    badgeIcon={cat?.icon}
                                     bg='#ffffd3'
                                 />
                             ))}
                         </Flex>
-                        <CardNotification bookmark={item.bookmark} emoji={item.emoji} />
+                        <CardNotification bookmark={item.bookmarks} likes={item.likes} />
                     </Flex>
                     <Box>
                         <Heading
@@ -197,7 +217,7 @@ export default function MainRecipeCard({ ...item }: RecipeCardWithFilter) {
                     p={0}
                 >
                     <SaveButton />
-                    <Link to={getRecipeURL()}>
+                    <Link to={`${formRecipeUrl(item.categoriesIds[0])}/${item._id}`}>
                         <CookButton index={item.index} />
                     </Link>
                 </CardFooter>

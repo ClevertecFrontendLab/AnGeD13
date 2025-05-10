@@ -10,14 +10,47 @@ import {
     Text,
 } from '@chakra-ui/react';
 
-import { Recipe } from '~/data/allRecipes';
+import { SRC_BASE_URL } from '~/constants/paths';
+import { useGetCategoriesQuery } from '~/query/category-api';
+import { TRecipe } from '~/store/types';
 import CategoryBadge from '~/ui/badges/CategoryBadge';
 import CardNotification from '~/ui/cardNotification/CardNotifiction';
 
-import imgSrc from '../../assets/images/recipes/ham.jpg';
 import { BookmarkHeartIcon, EmojiHeartEyesIcon } from '../icon/icons/Icons';
 
-export default function DetailRecipeCard({ ...item }: Recipe) {
+export default function DetailRecipeCard({ ...recipe }: TRecipe) {
+    const { data } = useGetCategoriesQuery();
+    const categories = data?.filter((category) => category.subCategories) || [];
+    const getCategory = (id: string) =>
+        categories.find(
+            (catItem) => catItem.subCategories.some((sub) => sub._id === id) || catItem._id === id,
+        );
+
+    const badgesInfo = recipe.categoriesIds.map((item) => getCategory(item));
+    const uniqueBadges = [...new Set(badgesInfo)];
+
+    const pluralRules = new Intl.PluralRules('ru-RU');
+
+    const getPluralForm = (count: number) => {
+        const timeForms = ['минута', 'минуты', 'минут'];
+        const rule = pluralRules.select(count);
+        let formIndex;
+        switch (rule) {
+            case 'one':
+                formIndex = 0;
+                break;
+            case 'few':
+                formIndex = 1;
+                break;
+            case 'many':
+                formIndex = 2;
+                break;
+            default:
+                formIndex = 2;
+        }
+        return timeForms[formIndex];
+    };
+
     return (
         <Card
             as='article'
@@ -57,8 +90,8 @@ export default function DetailRecipeCard({ ...item }: Recipe) {
                 }}
                 borderRadius='8px'
                 objectFit='cover'
-                src={imgSrc}
-                alt={item.title}
+                src={`${SRC_BASE_URL}/${recipe.image}`}
+                alt={recipe.title}
             />
             <Flex
                 flexDirection='column'
@@ -80,16 +113,16 @@ export default function DetailRecipeCard({ ...item }: Recipe) {
                         }}
                     >
                         <Flex columnGap='16px' rowGap='8px' flexWrap='wrap'>
-                            {item.badgeCategory.map((cat, index) => (
+                            {uniqueBadges.map((cat, index) => (
                                 <CategoryBadge
                                     key={index}
-                                    category={cat}
-                                    badgeIcon={item.badgeIcon[index]}
+                                    category={cat?.title}
+                                    badgeIcon={cat?.icon}
                                     bg='#ffffd3'
                                 />
                             ))}
                         </Flex>
-                        <CardNotification bookmark={item.bookmark} emoji={item.emoji} />
+                        <CardNotification bookmark={recipe.bookmarks} likes={recipe.likes} />
                     </Flex>
                     <Box>
                         <Heading
@@ -114,7 +147,7 @@ export default function DetailRecipeCard({ ...item }: Recipe) {
                                 xl: '55%',
                             }}
                         >
-                            {item.title}
+                            {recipe.title}
                         </Heading>
                         <Text
                             fontWeight={400}
@@ -125,7 +158,7 @@ export default function DetailRecipeCard({ ...item }: Recipe) {
                                 md: 2,
                             }}
                         >
-                            {item.description}
+                            {recipe.description}
                         </Text>
                     </Box>
                 </CardBody>
@@ -167,7 +200,7 @@ export default function DetailRecipeCard({ ...item }: Recipe) {
                                 fill='black'
                             />
                         </svg>
-                        {item.time}
+                        {`${recipe.time} ${getPluralForm(recipe.time)}`}
                     </Flex>
                     <Flex
                         columnGap={{

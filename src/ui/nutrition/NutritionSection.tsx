@@ -1,17 +1,15 @@
 import { Flex, Heading } from '@chakra-ui/react';
 
+import { NutritionValueType } from '~/store/types';
+
 import NutritionCard from './NutritionCard';
 
-interface NutritionProps {
-    nutrition: {
-        calories: number;
-        proteins: number;
-        fats: number;
-        carbohydrates: number;
+export default function NutritionSection({ ...nutrition }: NutritionValueType) {
+    const getProteins = () => {
+        if (nutrition.protein != undefined) return nutrition.protein;
+        if (nutrition.proteins != undefined) return nutrition.proteins;
     };
-}
 
-export default function NutritionSection({ nutrition }: NutritionProps) {
     return (
         <Flex
             flexDirection='column'
@@ -41,7 +39,7 @@ export default function NutritionSection({ nutrition }: NutritionProps) {
                 }}
             >
                 <NutritionCard title='калорийность' value={nutrition.calories} measure='ККАЛ' />
-                <NutritionCard title='белки' value={nutrition.proteins} measure='ГРАММ' />
+                <NutritionCard title='белки' value={getProteins()!} measure='ГРАММ' />
                 <NutritionCard title='жиры' value={nutrition.fats} measure='ККАЛ' />
                 <NutritionCard title='углеводы' value={nutrition.carbohydrates} measure='ККАЛ' />
             </Flex>

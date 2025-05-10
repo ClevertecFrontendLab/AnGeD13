@@ -24,6 +24,13 @@ export default function IngredientsTable({ ingredients, portions }: Ingredients)
         }
     };
 
+    const roundValue = (value: number) => {
+        if (value == parseFloat(value.toFixed(2))) {
+            return value;
+        }
+        return value.toFixed(2);
+    };
+
     return (
         <TableContainer>
             <Table variant='striped' colorScheme='blackAlpha'>
@@ -81,9 +88,11 @@ export default function IngredientsTable({ ingredients, portions }: Ingredients)
                                 fontWeight={500}
                                 data-test-id={`ingredient-quantity-${index}`}
                             >
-                                {product.measureUnit !== 'по вкусу'
-                                    ? `${(parseFloat(product.count) * selectedPortions) / initialPortions} ${product.measureUnit}`
-                                    : product.measureUnit}
+                                {product.measureUnit !== 'по вкусу' && product.count !== 'по вкусу'
+                                    ? `${roundValue((parseFloat(product.count) * selectedPortions) / initialPortions)} ${product.measureUnit}`
+                                    : product.measureUnit === 'по вкусу'
+                                      ? product.measureUnit
+                                      : product.count}
                             </Td>
                         </Tr>
                     ))}

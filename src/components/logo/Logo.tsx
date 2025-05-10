@@ -15,7 +15,7 @@ export default function Logo() {
             h='32px'
             w={{
                 base: '32px',
-                md: '136px',
+                md: '256px',
             }}
         >
             <Link to='/' onClick={() => handleClick()}>

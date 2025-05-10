@@ -23,6 +23,12 @@ interface BreadcrumbsContext {
     setFilterGlobalAuthor: Dispatch<SetStateAction<string[]>>;
     filterGlobalCategories: string[];
     setFilterGlobalCategories: Dispatch<SetStateAction<string[]>>;
+    isAuthorized: boolean;
+    setIsAuthorized: Dispatch<SetStateAction<boolean>>;
+    isActiveSwitcher: boolean;
+    setIsActiveSwitcher: Dispatch<SetStateAction<boolean>>;
+    isSearching: boolean;
+    setIsSearching: Dispatch<SetStateAction<boolean>>;
 }
 
 export const BreadcrumbsContext = createContext<BreadcrumbsContext>({
@@ -46,4 +52,10 @@ export const BreadcrumbsContext = createContext<BreadcrumbsContext>({
     setFilterGlobalAuthor: () => {},
     filterGlobalCategories: [],
     setFilterGlobalCategories: () => {},
+    isAuthorized: false,
+    setIsAuthorized: () => {},
+    isActiveSwitcher: false,
+    setIsActiveSwitcher: () => {},
+    isSearching: false,
+    setIsSearching: () => {},
 });

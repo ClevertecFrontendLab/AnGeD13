@@ -4,24 +4,24 @@ import { BookmarkHeartIcon, EmojiHeartEyesIcon } from '../../components/icon/ico
 
 interface Props {
     bookmark?: number;
-    emoji?: number;
+    likes?: number;
 }
 
-export default function CardNotification({ bookmark, emoji }: Props) {
+export default function CardNotification({ bookmark, likes }: Props) {
     return (
         <Flex columnGap='8px' fontWeight={600} fontSize={12} lineHeight='133%' color='#2db100'>
-            {bookmark && (
+            {bookmark ? (
                 <Flex columnGap='6px' p='4px' alignItems='center'>
                     <BookmarkHeartIcon size={12} />
                     {bookmark}
                 </Flex>
-            )}
-            {emoji && (
+            ) : null}
+            {likes ? (
                 <Flex columnGap='6px' p='4px' alignItems='center'>
                     <EmojiHeartEyesIcon size={12} />
-                    {emoji}
+                    {likes}
                 </Flex>
-            )}
+            ) : null}
         </Flex>
     );
 }
